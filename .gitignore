@@ -1,0 +1,30 @@
+# Latex
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.log
+*.out
+*.run.xml
+*.xwm
+*.synctex.gz
+*.bak
+*.dvi
+*.nav
+*.ps
+*.snm
+*.tcp
+*.toc
+*.tps
+*.auxlock
+*-eps-converted-to.pdf
+*.fls
+*.fdb_latexmk
+
+# Python
+*.pyc
+*__pycache__
+
+#L4DC 2024
+Papers/24_L4DC_Safe_Multi_Source_Bayesian_Optimization/Code/data/*
+Papers/24_L4DC_Safe_Multi_Source_Bayesian_Optimization/Code/slurm*
