@@ -13,7 +13,7 @@ The code may be used as an safe multi-task Bayesian optimization framework to op
 
 
 ## Prerequisites
-## soon updated 
+## ToDo update
 To run the scripts in this repository, you will need a working copy of the GPML toolbox (https://gitlab.com/hnickisch/gpml-matlab).
 The code in this repository has been tested in the following environment:
 
