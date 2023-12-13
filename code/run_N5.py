@@ -31,10 +31,9 @@ smoke_test = False
 
 torch.set_default_dtype(torch.float64)
 
-folder = sys.argv[1]        # path and folder name where results are saved
-if folder.find("trunc") != -1: utils.get_robust_gp.change_truncate(True)
-
-if not os.path.exists(f"data/{folder}"): os.mkdir(f"data/{folder}")
+if len(sys.argv) > 1:
+    add_arg = sys.argv[1]        # Should \bar{beta} be bounded? if so add trunc as additional argument to the script
+    if add_arg.find("trunc") != -1: utils.get_robust_gp.change_truncate(True)
 
 # controller typ
 K_typ = "PI"
@@ -46,7 +45,9 @@ Ki_max = 3e1
 Ki_min = 0
 
 ell = 0.1     # lengthscale
-disturbance = 1/5 # filter disturbance 0.2 corresponds to +- 10%
+
+# filter disturbance 0.2 corresponds to +- 10% 
+disturbance = 1/5   # for paper plots change to 0/5, 1/5, 3/5, 5/5, 7/5 
 utils.utils.change_ell(ell)
 
 num = 5         # number of lasers in chain "N"
@@ -55,7 +56,7 @@ tasks = list(range(num_tsk))
 
 bounds=torch.tensor([[Kp_min,Ki_min],[Kp_max,Ki_max]]).repeat(1,num)
 
-X_init = load("data/X_init_vals_num5.npy")
+X_init = load("data_paper/X_init_vals_num5.npy")
 x0 = torch.tensor(X_init[0,...]).unsqueeze(0)
 
 if K_typ == "PI":
@@ -118,7 +119,7 @@ for i in range(X_init.size(0)):
     print(f"Best value: {round(bo.best_y[-1],3)} at input: {unnormalize(bo.best_x[-1],bounds).round(decimals=3)}")
 
     # save data
-    file = open(f"data/{folder}/num_laser{num}.obj",'wb')
+    file = open(f"data/num_laser{num}.obj",'wb')
     sets = {'data_sets': data_sets, 'bests': bests, 'plants': G}
     pickle.dump(sets,file)
     file.close()
