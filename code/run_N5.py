@@ -47,7 +47,7 @@ Ki_min = 0
 ell = 0.1     # lengthscale
 
 # filter disturbance 0.2 corresponds to +- 10% 
-disturbance = 1/5   # for paper plots change to 0/5, 1/5, 3/5, 5/5, 7/5 
+disturbance = 1/5  
 utils.utils.change_ell(ell)
 
 num = 5         # number of lasers in chain "N"
