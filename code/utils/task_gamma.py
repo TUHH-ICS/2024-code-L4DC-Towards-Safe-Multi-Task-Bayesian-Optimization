@@ -11,8 +11,7 @@
 
 import torch
 from gpytorch.mlls import ExactMarginalLogLikelihood
-from math import floor
-from copy import deepcopy
+
 
 weight = 10  # weight for selecting parameter bounds
 

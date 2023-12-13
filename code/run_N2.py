@@ -25,7 +25,7 @@ torch.set_default_dtype(torch.float64)
 from plant.utils import build_laser_model, get_nh2
 from numpy import load
 
-import sys, os
+import sys
 
 import pickle
 
@@ -50,9 +50,19 @@ Ki_min = 0
 ell = 0.1     # lengthscale
 utils.utils.change_ell(ell)
 
+
 # filter disturbance 0.2 corresponds to +- 10% 
 disturbance = 1/5 # for paper plots change to 0/5, 1/5, 3/5, 5/5, 7/5 
 
+# shape factor eta for lkj prior 
+if disturbance == 0 or disturbance == 1/5: 
+    eta = 0.1 
+elif disturbance == 3/5: 
+    eta = 0.5
+else: 
+    eta = 1.0
+utils.utils.change_eta(eta)
+  
 
 num = 2         # number of lasers in chain "N"
 num_tsk = 3     # number of tasks "u"

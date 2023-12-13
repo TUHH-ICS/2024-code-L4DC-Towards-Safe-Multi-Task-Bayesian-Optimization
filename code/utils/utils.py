@@ -17,6 +17,11 @@ ub1 = .2
 lb2 = 1.e1
 ub2 = 2.e1
 ell = 0.1
+eta = 0.1
+
+def change_eta(new_eta):
+    global eta
+    eta = new_eta
 
 def change_ell(new_ell):
     global ell
@@ -47,7 +52,7 @@ def build_gp(train_inputs, train_targets):
         task_covar_module=IndexKernelAllPriors(
             num_tasks,
             num_tasks,
-            covar_factor_prior=LKJCholeskyFactorPriorPyro(num_tasks,1e-1),
+            covar_factor_prior=LKJCholeskyFactorPriorPyro(num_tasks,eta),
                             ),
         mean_module=ConstantMean()
     )

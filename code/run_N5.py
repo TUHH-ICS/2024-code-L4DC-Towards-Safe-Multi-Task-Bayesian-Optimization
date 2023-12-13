@@ -23,7 +23,7 @@ from bo.bo_loop import BayesianOptimization
 from plant.utils import build_laser_model, get_nh2
 from numpy import load
 
-import sys, os
+import sys
 
 import pickle
 
