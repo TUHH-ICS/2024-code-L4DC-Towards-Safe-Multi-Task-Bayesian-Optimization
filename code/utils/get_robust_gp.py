@@ -25,7 +25,7 @@ def change_truncate(x):
 def getboundinggp(sampmods, model0, delta_max: float = 0.05):
     gamma, task_lambda, task_thdoubprime = get_task_gamma(model0, sampmods, delta_max)
 
-    print(f"Robust Task Covar Factor: {task_thdoubprime}")
+    #print(f"Robust Task Covar Factor: {task_thdoubprime}")
     robustmodel = deepcopy(model0)
 
     robustmodel.task_covar_module._set_covar_factor(task_thdoubprime)
@@ -38,7 +38,7 @@ def getboundinggp(sampmods, model0, delta_max: float = 0.05):
         sqrtbeta = torch.minimum(sqrtbeta, torch.tensor([2 * maxsqrtbeta]))
     # print(f"sqrtbeta: {sqrtbeta}")
     # print(f"sqrtzeta: {sqrtzeta}")
-    # print(f"Covar_Mat: {task_thdoubprime@task_thdoubprime.T}")
+    print(f"Covar Matrix: {task_thdoubprime@task_thdoubprime.T}")
     # print(f"gamma: {gamma}")
 
     return robustmodel, sqrtbeta.squeeze(), gamma.squeeze()

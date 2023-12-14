@@ -6,7 +6,7 @@
 
 This repository contains supplementary material and the code to reproduce the tables and figures presented in 
 
-> J. O. Lübsen, C. Hespe, A. Eichler, "Safe Multi-Task Bayesian Optimization", submitted to the 6th Conference of Learning for dynamics and control, 2024
+> J. O. Lübsen, C. Hespe, A. Eichler, "Safe Multi-Task Bayesian Optimization", submitted to the 6th Annual Learning for Dynamics and Control Conference, 2024
 
 The preprint with supplementary material including proofs is available on arXiv:
 
