@@ -10,13 +10,12 @@
 # --------------------------------------------------------------------------------------------
 
 
-from control import gram, summing_junction, interconnect, tf2ss, tf
-from control import StateSpace
-from numpy import trace, sqrt, minimum
-from plant.models import get_disturbance_filter, get_laser_model, get_reference_filter
-from botorch.utils.transforms import unnormalize
-from slycot.exceptions import SlycotError
 import torch
+from botorch.utils.transforms import unnormalize
+from control import StateSpace, gram, interconnect, summing_junction, tf, tf2ss
+from numpy import minimum, sqrt, trace
+from plant.models import get_disturbance_filter, get_laser_model, get_reference_filter
+from slycot.exceptions import SlycotError
 
 
 def get_nh2(param, G, bounds, K_typ="PI"):
@@ -69,8 +68,8 @@ def build_laser_model(num_laser: int = 1, disturbance: float | None = None):
         if i == 0:
             sumblk.extend(
                 [
-                    summing_junction(inputs=["phi(0)", "d(0)"], output=f"y(0)"),
-                    summing_junction(inputs=["r", "-y(0)"], output=f"e(0)"),
+                    summing_junction(inputs=["phi(0)", "d(0)"], output="y(0)"),
+                    summing_junction(inputs=["r", "-y(0)"], output="e(0)"),
                 ]
             )
             Fd_list.append(Fd)
@@ -82,7 +81,7 @@ def build_laser_model(num_laser: int = 1, disturbance: float | None = None):
                 [
                     summing_junction(inputs=[f"phi({i})", f"d({i})"], output=f"y({i})"),
                     summing_junction(
-                        inputs=[f"y({i-1})", f"-y({i})"], output=f"e({i})"
+                        inputs=[f"y({i - 1})", f"-y({i})"], output=f"e({i})"
                     ),
                 ]
             )
@@ -92,12 +91,12 @@ def build_laser_model(num_laser: int = 1, disturbance: float | None = None):
         + ["r"]
         + [f"w({i})" for i in range(num_laser)]
     )
-    outputs = [f"e({i})" for i in range(num_laser)] + [f"y({num_laser-1})"]
+    outputs = [f"e({i})" for i in range(num_laser)] + [f"y({num_laser - 1})"]
     Glaser = interconnect(sumblk + G_list + Fd_list, inputs=inputs, outputs=outputs)
 
     inputs[num_laser] = "wr"
     outputs[-1] = "z"
-    sumblk = summing_junction(inputs=[f"-y({num_laser-1})", "r"], outputs="z")
+    sumblk = summing_junction(inputs=[f"-y({num_laser - 1})", "r"], outputs="z")
     GlaserChain = interconnect([Glaser, sumblk, Fr], inputs=inputs, outputs=outputs)
     return GlaserChain
 

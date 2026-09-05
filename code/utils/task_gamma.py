@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 
-#---------------------------------------------------------------------------------------------
-# For Paper, 
+# ---------------------------------------------------------------------------------------------
+# For Paper,
 # "Safe Multi-Task Bayesian Optimization"
 # by Jannis O. Lübsen, Christian Hespe, Annika Eichler
 # Copyright (c) Institute of Control Systems, Hamburg University of Technology. All rights reserved.
 # Licensed under the GPLv3. See LICENSE in the project root for license information.
 # Author(s): Jannis Lübsen
-#--------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 import torch
-from gpytorch.mlls import ExactMarginalLogLikelihood
-
 
 weight = 10  # weight for selecting parameter bounds
 
@@ -76,8 +74,7 @@ def get_task_gamma(model0, sampmods, delta_max: float):
 def _get_chol_fact(mat):
     try:
         thdoubprime = torch.linalg.cholesky(mat)
-    except:
-        Warning("Chol decomposition failed. Trying next matrix...")
+    except RuntimeError:
         return torch.tensor([0.0]), False
     return thdoubprime, True
 
@@ -85,6 +82,6 @@ def _get_chol_fact(mat):
 def _solve_systems(A, B):
     try:
         sol = torch.linalg.solve(A, B)
-    except:
+    except RuntimeError:
         return torch.tensor([0.0]), False
     return sol, True

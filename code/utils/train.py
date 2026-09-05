@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-#---------------------------------------------------------------------------------------------
-# For Paper, 
+# ---------------------------------------------------------------------------------------------
+# For Paper,
 # "Safe Multi-Task Bayesian Optimization"
 # by Jannis O. Lübsen, Christian Hespe, Annika Eichler
 # Copyright (c) Institute of Control Systems, Hamburg University of Technology. All rights reserved.
 # Licensed under the GPLv3. See LICENSE in the project root for license information.
 # Author(s): Jannis Lübsen
-#--------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 
 import torch
@@ -27,7 +27,7 @@ def multistart_optimization(gp, num_restarts=1, mode=2, max_iter=20):
         c = 0
         while not flag:
             if c == max_trials:
-                raise TimeoutError("GP is not optimizable with mode {mode}...")
+                raise TimeoutError(f"GP is not optimizable with mode {mode}...")
             gp = build_gp(
                 (training_inputs[:, :-1], training_inputs[:, -1:]),
                 training_targets.unsqueeze(-1),
@@ -81,7 +81,6 @@ def singlestart_optimization(
 
         try:
             optimizer.step(closure)
-        except:
-            Warning("Optimization failed")
+        except RuntimeError:
             return None, 0, False
     return gp, losses[-1], True

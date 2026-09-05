@@ -1,92 +1,130 @@
-import torch
-import matplotlib.pyplot as plt
+"""Recreate the comparison figure from the bundled experiment data."""
+
 import pickle
-import scipy.io
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 import matplotlib.transforms as mtransforms
+import scipy.io
+import torch
+
+PRIMARY_FILES = [
+    Path("data_paper/data/num_laser2_dist0_lengthscale010.obj"),
+    Path("data_paper/data/num_laser2_dist1_lengthscale010.obj"),
+    Path("data_paper/data/num_laser2_dist3_lengthscale010.obj"),
+    Path("data_paper/data/num_laser2_dist5_lengthscale010.obj"),
+    Path("data_paper/data/num_laser2_dist7_lengthscale010.obj"),
+]
+
+COMPARISON_FILES = [
+    Path("data_paper/data/num_laser5_pure_bo.obj"),
+    Path("data_paper/data/matlabSim_num_laser5.mat"),
+    Path("data_paper/data/num_laser5_dist1_lengthscale010_2.obj"),
+]
 
 
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "serif",
-    "font.sans-serif": "Helvetica",
-    "font.size": 12,
-    "axes.grid" : True
-})
-
-files = ["data_paper/data/num_laser2_dist0_lengthscale010.obj",
-         "data_paper/data/num_laser2_dist1_lengthscale010.obj",
-         "data_paper/data/num_laser2_dist3_lengthscale010.obj",
-         "data_paper/data/num_laser2_dist5_lengthscale010.obj",
-         "data_paper/data/num_laser2_dist7_lengthscale010.obj",
-         ]
+def configure_plotting():
+    plt.rcParams.update(
+        {
+            "text.usetex": True,
+            "font.family": "serif",
+            "font.sans-serif": "Helvetica",
+            "font.size": 12,
+            "axes.grid": True,
+        }
+    )
 
 
-## uncomment to plot newly generated data
-# files = ["data/num_laser2_dist0_lengthscale010.obj",
-#          "data/num_laser2_dist1_lengthscale010.obj",
-#          "data/num_laser2_dist3_lengthscale010.obj",
-#          "data/num_laser2_dist5_lengthscale010.obj",
-#          "data/num_laser2_dist7_lengthscale010.obj",
-#          ]
-
-def plot1(ax,str,c):
-    with open(str,'rb') as file:
+def plot_disturbance_result(ax, path, color_index):
+    with path.open("rb") as file:
         data = pickle.load(file)
-    muy = -torch.tensor([y[-1] for y in data['bests']]).mean(dim=0)
-    id1 = str.find('dist') + len('dist')
-    id2 = str.find('_lengthscale')
-    ax.plot(muy,f'--C{c}',label=rf"$\pm {int(str[id1:id2])*10}\%$")
 
-fig,ax = plt.subplots(1,2)
-fig.set_size_inches(9,2)
+    mean_objective = -torch.tensor([result[-1] for result in data["bests"]]).mean(dim=0)
+    source = str(path)
+    disturbance_start = source.find("dist") + len("dist")
+    disturbance_end = source.find("_lengthscale")
+    disturbance_percent = int(source[disturbance_start:disturbance_end]) * 10
+    ax.plot(
+        mean_objective,
+        f"--C{color_index}",
+        label=rf"$\pm {disturbance_percent}\%$",
+    )
 
-labels = ['(a)','(b)']
 
-for label,ax_ in zip(labels,ax):
-        trans = mtransforms.ScaledTranslation(0/72, 3/72, fig.dpi_scale_trans)
-        ax_.text(0.0, 1.0, label, transform=ax_.transAxes + trans,
-                fontsize=14, va='bottom', ha='center')
-
-for i in range(len(files)):
-    plot1(ax[0],files[i],i)
-ax[0].legend(loc = 'upper right', ncol = 2)
-ax[0].set_xlabel(r"Evaluations of main task $n$")
-ax[0].set_ylabel(r"$J_{opt}(n)$")
-ax[0].set_xlim(0,50)
-ax[0].set_yticks([5,10,15,20])
-ax[0].set_ylim(5,25)
-###### Second Part
-
-files = ["data_paper/data/num_laser5_pure_bo.obj",
-         "data_paper/data/matlabSim_num_laser5.mat",
-         "data_paper/data/num_laser5_dist1_lengthscale010_2.obj"]
-
-## uncomment to plot newly generated data
-# files = ["data/num_laser5_pure_bo.obj",
-#          "data_paper/data/matlabSim_num_laser5.mat",
-#          "data_paper/data/num_laser5_dist1_lengthscale010_2.obj"]
-
-def plot2(ax,str,i):
-    if str.find('.obj') != -1:
-        with open(str,'rb') as file:
+def plot_comparison_result(ax, path, color_index):
+    if path.suffix == ".obj":
+        with path.open("rb") as file:
             data = pickle.load(file)
-            stdy,muy = torch.std_mean(-torch.tensor([y[-1] for y in data['bests']]),dim=0)
+        std_objective, mean_objective = torch.std_mean(
+            -torch.tensor([result[-1] for result in data["bests"]]), dim=0
+        )
     else:
-        data = scipy.io.loadmat(str)
-        stdy = data['std_Y'].squeeze(); muy = data['Y'].squeeze()
-    x = torch.arange(len(muy))
-    fill = ax.fill_between(x,muy+stdy,muy-stdy,color=f"C{i}",alpha=.3)
-    line, = ax.plot(x,muy,f"C{i}")
-    return (fill,line)
+        data = scipy.io.loadmat(path)
+        std_objective = data["std_Y"].squeeze()
+        mean_objective = data["Y"].squeeze()
 
-h = []
-for i in range(len(files)):
-    h.append(plot2(ax[1],files[i],i))
-   
-ax[1].legend(h,[r"\texttt{SafeBO} + EI",r"\texttt{MoSaOpt}",r"\texttt{SaMSBO} (our)"])
-ax[1].set_xlabel(r"Evaluations of main task $n$")
-ax[1].set_xlim(0,200)
-ax[1].set_yticks([14,16,18,20])
-ax[1].set_ylim(14,22)
-plt.show()
-fig.savefig("figures/comparison.pdf", bbox_inches='tight', pad_inches = 0.01, format = 'pdf')
+    evaluations = torch.arange(len(mean_objective))
+    fill = ax.fill_between(
+        evaluations,
+        mean_objective + std_objective,
+        mean_objective - std_objective,
+        color=f"C{color_index}",
+        alpha=0.3,
+    )
+    (line,) = ax.plot(evaluations, mean_objective, f"C{color_index}")
+    return fill, line
+
+
+def main():
+    configure_plotting()
+    figure, axes = plt.subplots(1, 2, figsize=(9, 2))
+
+    for label, axis in zip(("(a)", "(b)"), axes):
+        transform = mtransforms.ScaledTranslation(
+            0 / 72, 3 / 72, figure.dpi_scale_trans
+        )
+        axis.text(
+            0.0,
+            1.0,
+            label,
+            transform=axis.transAxes + transform,
+            fontsize=14,
+            va="bottom",
+            ha="center",
+        )
+
+    for index, path in enumerate(PRIMARY_FILES):
+        plot_disturbance_result(axes[0], path, index)
+    axes[0].legend(loc="upper right", ncol=2)
+    axes[0].set_xlabel(r"Evaluations of main task $n$")
+    axes[0].set_ylabel(r"$J_{opt}(n)$")
+    axes[0].set_xlim(0, 50)
+    axes[0].set_yticks([5, 10, 15, 20])
+    axes[0].set_ylim(5, 25)
+
+    handles = [
+        plot_comparison_result(axes[1], path, index)
+        for index, path in enumerate(COMPARISON_FILES)
+    ]
+    axes[1].legend(
+        handles,
+        [r"\texttt{SafeBO} + EI", r"\texttt{MoSaOpt}", r"\texttt{SaMSBO} (our)"],
+    )
+    axes[1].set_xlabel(r"Evaluations of main task $n$")
+    axes[1].set_xlim(0, 200)
+    axes[1].set_yticks([14, 16, 18, 20])
+    axes[1].set_ylim(14, 22)
+
+    output_dir = Path("figures")
+    output_dir.mkdir(exist_ok=True)
+    figure.savefig(
+        output_dir / "comparison.pdf",
+        bbox_inches="tight",
+        pad_inches=0.01,
+        format="pdf",
+    )
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()

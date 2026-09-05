@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-#---------------------------------------------------------------------------------------------
-# For Paper, 
+# ---------------------------------------------------------------------------------------------
+# For Paper,
 # "Safe Multi-Task Bayesian Optimization"
 # by Jannis O. Lübsen, Christian Hespe, Annika Eichler
 # Copyright (c) Institute of Control Systems, Hamburg University of Technology. All rights reserved.
 # Licensed under the GPLv3. See LICENSE in the project root for license information.
 # Author(s): Jannis Lübsen
-#--------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 
 import control

@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
-#---------------------------------------------------------------------------------------------
-# For Paper, 
+# ---------------------------------------------------------------------------------------------
+# For Paper,
 # "Safe Multi-Task Bayesian Optimization"
 # by Jannis O. Lübsen, Christian Hespe, Annika Eichler
 # Copyright (c) Institute of Control Systems, Hamburg University of Technology. All rights reserved.
 # Licensed under the GPLv3. See LICENSE in the project root for license information.
 # Author(s): Jannis Lübsen
-#--------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 import torch
-from torch import Tensor
-from botorch.optim.optimize import optimize_acqf
 from botorch.acquisition import qExpectedImprovement, qUpperConfidenceBound
-from utils.utils import concat_data
 from botorch.acquisition.objective import ScalarizedPosteriorTransform
+from botorch.optim.optimize import optimize_acqf
+from torch import Tensor
+from utils.utils import concat_data
 
 N_TOL = -1e-6
 
@@ -26,8 +26,8 @@ class BayesianOptimization:
         tasks,
         bounds,
         threshold,
-        num_acq_samps: list = [1,1,1],
-        boundary_T= -15.0,
+        num_acq_samps: list = [1, 1, 1],
+        boundary_T=-15.0,
     ):
         self.obj = obj
         self.bounds = bounds
@@ -184,9 +184,9 @@ class BayesianOptimization:
             q=self.num_acq_samps[task],
             num_restarts=init_cond.size(0) if task == 0 else 1,
             raw_samples=512 if task != 0 else None,
-            nonlinear_inequality_constraints=[self.inequality_consts]
-            if task == 0
-            else None,
+            nonlinear_inequality_constraints=(
+                [self.inequality_consts] if task == 0 else None
+            ),
             batch_initial_conditions=init_cond if task == 0 else None,
             options={"maxiter": 20},
         )

@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 
-#---------------------------------------------------------------------------------------------
-# For Paper, 
+# ---------------------------------------------------------------------------------------------
+# For Paper,
 # "Safe Multi-Task Bayesian Optimization"
 # by Jannis O. Lübsen, Christian Hespe, Annika Eichler
 # Copyright (c) Institute of Control Systems, Hamburg University of Technology. All rights reserved.
 # Licensed under the GPLv3. See LICENSE in the project root for license information.
 # Author(s): Jannis Lübsen
 # This code is partially based on the index kernel of Gpytorch, see https://docs.gpytorch.ai/en/stable/kernels.html#specialty-kernels
-#--------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 import torch
-from torch import Tensor
 from gpytorch.constraints import Interval
-from gpytorch.priors import Prior
-from gpytorch.kernels.index_kernel import IndexKernel
 from gpytorch.kernels import Kernel
+from gpytorch.kernels.index_kernel import IndexKernel
+from gpytorch.priors import Prior
+from torch import Tensor
 
 
 class IndexKernelAllPriors(IndexKernel):
@@ -78,9 +78,11 @@ class IndexKernelAllPriors(IndexKernel):
             value = torch.as_tensor(value).to(self.raw_covar_factor)
 
         self.initialize(
-            raw_covar_factor=self.raw_covar_factor_constraint.inverse_transform(value)
-            if hasattr(self, "raw_covar_factor_constraint")
-            else value
+            raw_covar_factor=(
+                self.raw_covar_factor_constraint.inverse_transform(value)
+                if hasattr(self, "raw_covar_factor_constraint")
+                else value
+            )
         )
 
     def _covar_factor_param(self, m: Kernel) -> Tensor:

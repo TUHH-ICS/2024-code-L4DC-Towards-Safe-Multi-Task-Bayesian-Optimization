@@ -1,39 +1,79 @@
-# Safe Multi-Task Bayesian Optimization
+# Towards Safe Multi-Task Bayesian Optimization
 
+Reference implementation and supplementary material for the L4DC 2024 paper **“Towards Safe Multi-Task Bayesian Optimization.”** The experiments use related, inexpensive tasks to accelerate safe Bayesian optimization of an expensive primary task while accounting for uncertainty in the learned task correlations.
 
+[Published paper (PMLR)](https://proceedings.mlr.press/v242/lubsen24a.html) · [arXiv preprint](https://arxiv.org/abs/2312.07281) · [Supplementary PDF](paper/Safe_Multi-Task_Bayesian_Optimization_Git.pdf)
 
-## General
+## Repository layout
 
-This repository contains supplementary material and the code to reproduce the tables and figures presented in 
+| Path | Purpose |
+| --- | --- |
+| `code/test_run.py` | Small interactive example with online posterior plots |
+| `code/run_N2.py` | Two-laser experiments corresponding to Figure 3a |
+| `code/run_N5.py` | Five-laser SaMSBO experiment corresponding to Figure 3b |
+| `code/plot.py` | Recreates the comparison figure from the bundled result files |
+| `code/bo/`, `code/model/`, `code/cov/` | Optimization loop and multi-task GP implementation |
+| `code/plant/` | Laser-chain models and control utilities |
+| `code/data_paper/` | Initial conditions and result data used in the paper |
 
-> J. O. Lübsen, C. Hespe, A. Eichler, "Safe Multi-Task Bayesian Optimization", submitted to the 6th Annual Learning for Dynamics and Control Conference, 2024
+## Requirements
 
-The preprint with supplementary material including proofs is available on arXiv:
+The code was developed with Python 3.10.12 on Ubuntu 22.04.3 LTS. A virtual environment is recommended.
 
-http://arxiv.org/abs/2312.07281
+```bash
+python3.10 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
 
-The code has three main entry points, which are located in the `code` directory. Usually, the user needs to do some adjustments which are specified in the respective file.
+`slycot` requires a working BLAS/LAPACK and Fortran toolchain when a compatible binary wheel is unavailable. The plotting script also uses LaTeX text rendering, so a LaTeX installation is required to reproduce the publication typography.
 
-1. `test_run.py` starts the optimization of a low dimensional problem with additional online generated figures. It provides a good illustration of how the algorithm works. In the file, the user can switch between a one and two dimensional problem.
-2. `run_N2.py` starts to generate the data that is used in Figure 3 (a). The script needs to be executed repetitively with different disturbances.
-3. `run_N5.py` starts to generate the data similar to Figure 3 (b) (only SaMSBO).
+## Running the experiments
 
-Note that running scripts `run_N2.py` and `run_N5.py` may take a long time.
-After generating the data, the script `plot.py` can be used to plot a figure similar to Figure 3.
+Run the scripts from the `code` directory so that their relative data paths resolve correctly:
 
+```bash
+cd code
 
-## Prerequisites
+# Short visual demonstration
+python test_run.py
 
-To run the code install python3.10 and the dependencies specified in `requirements.txt`.
+# Generate two- and five-laser experiment data
+python run_N2.py
+python run_N5.py
 
-> pip install -r requirements.txt
+# Use a truncated confidence parameter in either experiment
+python run_N2.py trunc
+python run_N5.py trunc
+```
 
-The code in this repository was tested in the following environment:
+The full optimization experiments are computationally expensive. Experiment settings such as the disturbance level, number of evaluations, and selected controller type are documented near the top of each entry-point script.
 
-* *Ubuntu 22.04.3 LTS
-* *Python 3.10.12
+Generated result files are written to `code/data/`. To recreate the comparison figure from the data shipped with the repository, run:
 
+```bash
+python plot.py
+```
 
+The figure is saved as `code/figures/comparison.pdf`.
 
+## Citation
 
+```bibtex
+@inproceedings{lubsen2024towards,
+  title     = {Towards Safe Multi-Task Bayesian Optimization},
+  author    = {L\"{u}bsen, Jannis and Hespe, Christian and Eichler, Annika},
+  booktitle = {Proceedings of the 6th Annual Learning for Dynamics and Control Conference},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {242},
+  pages     = {839--851},
+  year      = {2024},
+  publisher = {PMLR},
+  url       = {https://proceedings.mlr.press/v242/lubsen24a.html}
+}
+```
 
+## License
+
+This project is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE).
